@@ -35,8 +35,55 @@ const loginUser = asyncHandler(async (req, res) => {
     );
   }
 });
-
+const updateSingleUser = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  try{
+    const updateUser = await User.findByIdAndUpdate(id, {
+      firstname: req.body?.firstname,
+      lastname: req.body?.lastname,
+      mobile: req.body?.mobile,
+      email: req.body?.email,
+    }, {new: true});
+    res.json(updateUser)
+  }catch(error){
+    throw new Error(error)
   }
 });
 
-module.exports = { createUser, loginUser };
+const getAllUsers = asyncHandler(async (req, res) => {
+  try {
+    const getUsers = await User.find();
+    res.json(getUsers);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
+const getSingleUsers = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  try {
+    const getUsers = await User.findById(id);
+    res.json(getUsers);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
+const deleteSingleUser = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  try {
+    const deleteUser = await User.findByIdAndDelete(id);
+    res.json(deleteUser);
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
+module.exports = {
+  createUser,
+  loginUser,
+  getAllUsers,
+  getSingleUsers,
+  deleteSingleUser,
+  updateSingleUser
+};
