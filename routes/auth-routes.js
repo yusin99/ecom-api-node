@@ -14,6 +14,7 @@ router.post("/login", loginUser);
 router.get("/all-users", getAllUsers);
 router.get("/:id", getSingleUsers);
 router.delete("/:id", deleteSingleUser);
-router.put("/:id", updateSingleUser);
+router.put("/block-user/:id", authMiddleware, isAdmin, blockSingleUser);
+router.put("/unblock-user/:id", authMiddleware, isAdmin, unblockSingleUser);
 
 module.exports = router;
