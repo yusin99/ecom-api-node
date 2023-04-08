@@ -2,35 +2,36 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
 // Declare the Schema of the User model
-var userSchema = new mongoose.Schema({
-  firstname: {
-    type: String,
-    required: true,
-    index: true,
-  },
-  lastname: {
-    type: String,
-    required: true,
-    index: true,
-  },
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-  },
-  mobile: {
-    type: String,
-    required: true,
-    unique: true,
-  },
-  password: {
-    type: String,
-    required: true,
-  },
-  role: {
-    type: String,
-    default: "user",
-  },
+var userSchema = new mongoose.Schema(
+  {
+    firstname: {
+      type: String,
+      required: true,
+      index: true,
+    },
+    lastname: {
+      type: String,
+      required: true,
+      index: true,
+    },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    mobile: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    password: {
+      type: String,
+      required: true,
+    },
+    role: {
+      type: String,
+      default: "user",
+    },
     cart: {
       type: Array,
       default: [],
