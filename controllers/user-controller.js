@@ -1,6 +1,7 @@
 const User = require("../models/userModel");
 const asyncHandler = require("express-async-handler");
 const { generateToken } = require("../config/jwt-token");
+const validateMongoDBId = require("../utils/validateMDBId");
 
 const createUser = asyncHandler(async (req, res) => {
   const email = req.body.email;
@@ -37,6 +38,7 @@ const loginUser = asyncHandler(async (req, res) => {
 });
 const updateSingleUser = asyncHandler(async (req, res) => {
   const { id } = req.user;
+  validateMongoDBId(id);
   try {
     const updateUser = await User.findByIdAndUpdate(
       id,
@@ -65,8 +67,12 @@ const getAllUsers = asyncHandler(async (req, res) => {
 
 const getSingleUsers = asyncHandler(async (req, res) => {
   const { id } = req.params;
+  validateMongoDBId(id);
   try {
     const getUsers = await User.findById(id);
+    if (!getUsers) {
+      return res.status(404).json({ message: "User not found", status: 404 });
+    }
     res.json(getUsers);
   } catch (error) {
     throw new Error(error);
@@ -75,6 +81,7 @@ const getSingleUsers = asyncHandler(async (req, res) => {
 
 const deleteSingleUser = asyncHandler(async (req, res) => {
   const { id } = req.params;
+  validateMongoDBId(id);
   try {
     const deleteUser = await User.findByIdAndDelete(id);
     res.json(deleteUser);
@@ -85,6 +92,8 @@ const deleteSingleUser = asyncHandler(async (req, res) => {
 
 const blockSingleUser = asyncHandler(async (req, res) => {
   const { id } = req.params;
+  validateMongoDBId(id);
+
   try {
     const blockedUser = await User.findByIdAndUpdate(
       id,
@@ -103,6 +112,8 @@ const blockSingleUser = asyncHandler(async (req, res) => {
 });
 const unblockSingleUser = asyncHandler(async (req, res) => {
   const { id } = req.params;
+  validateMongoDBId(id);
+
   try {
     const unblockedUser = await User.findByIdAndUpdate(
       id,
