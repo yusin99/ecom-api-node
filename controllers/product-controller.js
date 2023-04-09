@@ -1,10 +1,13 @@
 const Product = require("../models/productModel");
 const asyncHandler = require("express-async-handler");
 const validateMongoDBId = require("../utils/validateMDBId");
-const slugify = require("slugify")
+const slugify = require("slugify");
 
 const createProduct = asyncHandler(async (req, res, next) => {
   try {
+    if (req.body.title) {
+      req.body.slug = slugify(req.body.title);
+    }
     const newProduct = await Product.create(req.body);
     res.json({ newProduct });
   } catch (error) {
@@ -16,12 +19,12 @@ const updateSingleProduct = asyncHandler(async (req, res, next) => {
   validateMongoDBId(id);
   try {
     if (req.body.title) {
-        req.body.slug = slugify(req.body.title);
+      req.body.slug = slugify(req.body.title);
     }
-    const updateProduct = await Product.findOneAndUpdate(id , req.body, {
+    const updateProduct = await Product.findOneAndUpdate(id, req.body, {
       new: true,
     });
-    res.json({updateProduct});
+    res.json({ updateProduct });
   } catch (error) {
     throw new Error(error);
   }
