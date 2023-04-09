@@ -9,8 +9,13 @@ const authRouter = require("./routes/auth-routes");
 const productRouter = require("./routes/product-routes");
 const cookieParser = require("cookie-parser");
 const morgan = require("morgan");
+const rateLimiter = require("./middlewares/rate-limiter");
+
 
 dbConnection();
+
+// Apply rate limiter middleware to all routes
+app.use(rateLimiter);
 
 app.use(morgan('combined'));
 // Middleware for parsing JSON request bodies
