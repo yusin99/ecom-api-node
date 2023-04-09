@@ -61,7 +61,7 @@ const getAllProducts = asyncHandler(async (req, res) => {
     const excludeFields = ["page", "sort", "limit", "fields"];
     excludeFields.forEach((el) => delete queryObj[el]);
     let queryStr = JSON.stringify(queryObj);
-    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
+    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`); // Replace query string keywords with corresponding MongoDB query operators
 
     let query = Product.find(JSON.parse(queryStr));
 
