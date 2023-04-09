@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
+const crypto = require("crypto");
 const saltRounds = 10;
 // Declare the Schema of the User model
 var userSchema = new mongoose.Schema(
@@ -27,6 +28,17 @@ var userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: true,
+      minlength: 8, // Minimum password length
+      validate: {
+        validator: function (value) {
+          // Password complexity requirements: at least one uppercase letter, one lowercase letter, one digit, and one special character
+          return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/.test(
+            value
+          );
+        },
+        message:
+          "Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character",
+      },
     },
     role: {
       type: String,
@@ -48,18 +60,33 @@ var userSchema = new mongoose.Schema(
       default: false,
     },
     refreshToken: {
-      type: String
-    }
+      type: String,
+    },
+    passwordChangedAt: Date,
+    passwordResetToken: String,
+    passwordResetExpires: Date,
   },
   { timestamps: true }
 );
 
 userSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) {
+    next();
+  }
   const salt = await bcrypt.genSaltSync(saltRounds);
   this.password = await bcrypt.hash(this.password, salt);
 });
 userSchema.methods.isPasswordMatched = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
+};
+userSchema.methods.createPasswordResetToken = async function () {
+  const resetToken = crypto.randomBytes(32).toString("hex");
+  this.passwordResetToken = crypto
+    .createHash("sha256")
+    .update(resetToken)
+    .digest("hex");
+  this.passwordResetExpires = Date.now() + 30 * 60 * 1000;
+  return resetToken;
 };
 //Export the User model
 module.exports = mongoose.model("User", userSchema);
