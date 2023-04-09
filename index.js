@@ -6,6 +6,7 @@ const { errorHandler, notFound } = require("./middlewares/error-handler");
 const dotenv = require("dotenv").config();
 const PORT = process.env.PORT || 4000;
 const authRouter = require("./routes/auth-routes");
+const productRouter = require("./routes/product-routes");
 const cookieParser = require("cookie-parser")
 
 dbConnection();
@@ -16,6 +17,7 @@ app.use(bodyParser.urlencoded({ extended: true })); // Use body-parser.urlencode
 app.use(cookieParser());
 
 app.use("/api/user", authRouter);
+app.use("/api/product", productRouter);
 
 app.use(notFound);
 app.use(errorHandler);
