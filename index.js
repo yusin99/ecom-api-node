@@ -7,6 +7,7 @@ const dotenv = require("dotenv").config();
 const PORT = process.env.PORT || 4000;
 const authRouter = require("./routes/auth-routes");
 const productRouter = require("./routes/product-routes");
+const blogRouter = require("./routes/blog-routes");
 const cookieParser = require("cookie-parser");
 const morgan = require("morgan");
 const rateLimiter = require("./middlewares/rate-limiter");
@@ -26,6 +27,7 @@ app.use(cookieParser());
 
 app.use("/api/user", authRouter);
 app.use("/api/product", productRouter);
+app.use("/api/blog", blogRouter);
 
 app.use(notFound);
 app.use(errorHandler);
