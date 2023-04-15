@@ -62,6 +62,16 @@ var userSchema = new mongoose.Schema(
     refreshToken: {
       type: String,
     },
+    ratings: [
+      {
+        star: Number,
+        postedby: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+      },
+    ],
+    totalRaings: {
+      type: String,
+      default: 0,
+    },
     passwordChangedAt: Date,
     passwordResetToken: String,
     passwordResetExpires: Date,
