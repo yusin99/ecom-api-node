@@ -146,7 +146,7 @@ const rating = asyncHandler(async (req, res) => {
       return user.postedby.toString() == id.toString();
     });
     if (alreadyRated) {
-      const updateRating = await Product.updateOne(
+      await Product.updateOne(
         {
           ratings: { $elemMatch: alreadyRated },
         },
@@ -158,7 +158,7 @@ const rating = asyncHandler(async (req, res) => {
         }
       );
     } else {
-      const ratedProduct = await Product.findByIdAndUpdate(
+      await Product.findByIdAndUpdate(
         productId,
         {
           $push: {
