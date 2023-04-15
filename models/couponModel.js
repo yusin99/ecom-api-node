@@ -12,7 +12,6 @@ var couponSchema = new mongoose.Schema({
   expire: {
     type: Date,
     required: true,
-    unique: true,
   },
   discount: {
     type: Number,
@@ -20,5 +19,5 @@ var couponSchema = new mongoose.Schema({
   },
 });
 
-//Export the model
+// Export the model
 module.exports = mongoose.model("Coupon", couponSchema);
