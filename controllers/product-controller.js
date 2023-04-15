@@ -2,6 +2,7 @@ const Product = require("../models/productModel");
 const asyncHandler = require("express-async-handler");
 const validateMongoDBId = require("../utils/validateMDBId");
 const slugify = require("slugify");
+const User = require("../models/userModel");
 
 const createProduct = asyncHandler(async (req, res, next) => {
   try {
@@ -102,10 +103,44 @@ const getAllProducts = asyncHandler(async (req, res) => {
   }
 });
 
+const addToWishlist = asyncHandler(async (req, res) => {
+  const { id } = req.user;
+  const { productId } = req.body;
+
+  try {
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found", status: 404 });
+    }
+    const alreadyAdded = user.wishlist.find((id) => id.toString() == productId);
+    if (alreadyAdded) {
+      let user = await User.findByIdAndUpdate(
+        id,
+        {
+          $pull: { wishlist: productId },
+        },
+        { new: true }
+      );
+      res.json({ user });
+    } else {
+      let user = await User.findByIdAndUpdate(
+        id,
+        {
+          $push: { wishlist: productId },
+        },
+        { new: true }
+      );
+      res.json({ user });
+    }
+  } catch (error) {
+    throw new Error(error);
+  }
+});
 module.exports = {
   createProduct,
   updateSingleProduct,
   deleteSingleProduct,
   getSingleProduct,
   getAllProducts,
+  addToWishlist,
 };
