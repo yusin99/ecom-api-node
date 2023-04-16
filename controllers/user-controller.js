@@ -70,6 +70,40 @@ const loginUser = asyncHandler(async (req, res) => {
     );
   }
 });
+
+const loginUserAdmin = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
+  // checking if user exists
+  const admin = await User.findOne({ email: email });
+  if (admin.role !== "admin") throw new Error("Not authorized");
+  if (admin && (await admin.isPasswordMatched(password))) {
+    const refreshToken = await generateRefreshToken(admin?.id);
+    const updateUserRefreshToken = await User.findByIdAndUpdate(
+      admin?.id,
+      {
+        refreshToken: refreshToken,
+      },
+      { new: true }
+    );
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      maxAge: 72 * 60 * 60 * 1000,
+    });
+    res.json({
+      id: admin?._id,
+      firstname: admin?.firstname,
+      lastname: admin?.lastname,
+      email: admin?.email,
+      mobile: admin?.mobile,
+      token: generateToken(admin?._id),
+    });
+  } else {
+    throw new Error(
+      "Invalid username or password. Please verify your credeltials"
+    );
+  }
+});
+
 const logoutUser = asyncHandler(async (req, res) => {
   const cookie = req.cookies;
   if (!cookie?.refreshToken)
@@ -107,7 +141,7 @@ const updateSingleUser = asyncHandler(async (req, res) => {
       },
       { new: true }
     );
-    res.json({updateUser});
+    res.json({ updateUser });
   } catch (error) {
     throw new Error(error);
   }
@@ -116,7 +150,7 @@ const updateSingleUser = asyncHandler(async (req, res) => {
 const getAllUsers = asyncHandler(async (req, res) => {
   try {
     const getUsers = await User.find();
-    res.json({getUsers});
+    res.json({ getUsers });
   } catch (error) {
     throw new Error(error);
   }
@@ -130,7 +164,7 @@ const getSingleUsers = asyncHandler(async (req, res) => {
     if (!getUsers) {
       return res.status(404).json({ message: "User not found", status: 404 });
     }
-    res.json({getUsers});
+    res.json({ getUsers });
   } catch (error) {
     throw new Error(error);
   }
@@ -141,7 +175,7 @@ const deleteSingleUser = asyncHandler(async (req, res) => {
   validateMongoDBId(id);
   try {
     const deleteUser = await User.findByIdAndDelete(id);
-    res.json({deleteUser});
+    res.json({ deleteUser });
   } catch (error) {
     throw new Error(error);
   }
@@ -222,7 +256,7 @@ const forgotPassword = asyncHandler(async (req, res, next) => {
       htm: resetURL,
     };
     sendEmail(data);
-    res.json({token});
+    res.json({ token });
   } catch (error) {
     throw new Error(error);
   }
@@ -241,11 +275,12 @@ const resetPassword = asyncHandler(async (req, res) => {
   user.passwordResetToken = undefined;
   user.passwordResetExpires = undefined;
   await user.save();
-  res.json({user});
+  res.json({ user });
 });
 module.exports = {
   createUser,
   loginUser,
+  loginUserAdmin,
   getAllUsers,
   getSingleUsers,
   deleteSingleUser,
