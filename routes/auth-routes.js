@@ -15,6 +15,7 @@ const {
   resetPassword,
   loginUserAdmin,
   getWishlist,
+  updateAddress,
 } = require("../controllers/user-controller");
 const { authMiddleware, isAdmin } = require("../middlewares/auth-middleware");
 const router = express.Router();
@@ -37,5 +38,6 @@ router.put("/edit-user", authMiddleware, isAdmin, updateSingleUser);
 router.put("/block-user/:id", authMiddleware, isAdmin, blockSingleUser);
 router.put("/unblock-user/:id", authMiddleware, isAdmin, unblockSingleUser);
 router.put("/update-password", authMiddleware, updatePassword);
+router.put("/update-address", authMiddleware, updateAddress);
 
 module.exports = router;

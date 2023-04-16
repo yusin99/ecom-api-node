@@ -278,15 +278,32 @@ const resetPassword = asyncHandler(async (req, res) => {
   res.json({ user });
 });
 
-const getWishlist = asyncHandler(async (req,res)=>{
-  const {id} = req.user;
-  try{
+const getWishlist = asyncHandler(async (req, res) => {
+  const { id } = req.user;
+  try {
     const user = await User.findById(id).populate("wishlist");
-    res.json({"wishlist": user.wishlist});
-  }catch(error){
-    throw new Error(error)
+    res.json({ wishlist: user.wishlist });
+  } catch (error) {
+    throw new Error(error);
   }
-})
+});
+
+const updateAddress = asyncHandler(async (req, res) => {
+  const { id } = req.user;
+  validateMongoDBId(id);
+  try {
+    const user = await User.findByIdAndUpdate(
+      id,
+      {
+        address: req.body?.address,
+      },
+      { new: true }
+    );
+    res.json({ user });
+  } catch (error) {
+    throw new Error(error);
+  }
+});
 
 module.exports = {
   createUser,
@@ -304,4 +321,5 @@ module.exports = {
   forgotPassword,
   resetPassword,
   getWishlist,
+  updateAddress,
 };
