@@ -72,6 +72,10 @@ var userSchema = new mongoose.Schema(
       type: String,
       default: 0,
     },
+    address: {
+      type: String,
+      required: true,
+    },
     passwordChangedAt: Date,
     passwordResetToken: String,
     passwordResetExpires: Date,
