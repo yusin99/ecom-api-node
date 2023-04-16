@@ -1,6 +1,7 @@
 const multer = require("multer");
-const shrp = require("sharp");
+const sharp = require("sharp");
 const path = require("path");
+const fs = require("fs");
 
 const multerStorage = multer.diskStorage({
   destination: function (req, file, callback) {
@@ -13,7 +14,7 @@ const multerStorage = multer.diskStorage({
 });
 
 const multerFilter = (req, file, callback) => {
-  if (file.mimeType.startsWith("image")) {
+  if (file.mimetype.startsWith("image")) {
     callback(null, true);
   } else {
     callback(
@@ -35,11 +36,18 @@ const productImgResize = async (req, res, next) => {
   if (!req.files) return next();
   await Promise.all(
     req.files.map(async (file) => {
-      await sharp(file.path)
-        .resize(300, 300)
-        .toFormat("jpeg")
-        .jpeg({ quality: 90 })
-        .toFile(`public/images/product-img/${file.filename}`);
+      try {
+        await sharp(file.path)
+          .resize(300, 300)
+          .toFormat("jpeg")
+          .jpeg({ quality: 90 })
+          .toFile(
+            path.join(__dirname, "../public/images/product", file.filename)
+          );
+        fs.unlinkSync(path.join(__dirname, "../public/images/product", file.filename));
+      } catch (error) {
+        console.error("Error during image resizing:", error);
+      }
     })
   );
   next();
@@ -49,11 +57,16 @@ const blogImgResize = async (req, res, next) => {
   if (!req.files) return next();
   await Promise.all(
     req.files.map(async (file) => {
-      await sharp(file.path)
-        .resize(300, 300)
-        .toFormat("jpeg")
-        .jpeg({ quality: 90 })
-        .toFile(`public/images/blog-img/${file.filename}`);
+      try {
+        await sharp(file.path)
+          .resize(300, 300)
+          .toFormat("jpeg")
+          .jpeg({ quality: 90 })
+          .toFile(path.join(__dirname, "../public/images/blog", file.filename));
+        fs.unlinkSync(path.join(__dirname, "../public/images/blog", file.filename));
+      } catch (error) {
+        console.error("Error during image resizing:", error);
+      }
     })
   );
   next();

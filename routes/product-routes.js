@@ -8,9 +8,22 @@ const {
   getAllProducts,
   addToWishlist,
   rating,
+  uploadImages,
 } = require("../controllers/product-controller");
 const { isAdmin, authMiddleware } = require("../middlewares/auth-middleware");
+const {
+  uploadImage,
+  productImgResize,
+} = require("../middlewares/upload-image-middleware");
 
+router.put(
+  "/upload-image/:id",
+  authMiddleware,
+  isAdmin,
+  uploadImage.array("images", 10),
+  productImgResize,
+  uploadImages
+);
 router.post("/", authMiddleware, isAdmin, createProduct);
 router.get("/:id", getSingleProduct);
 router.get("/", getAllProducts);
