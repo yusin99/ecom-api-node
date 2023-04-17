@@ -516,6 +516,10 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
   const { id } = req.params;
   validateMongoDBId(id);
   try {
+    if (!Order.schema.path("orderStatus").enumValues.includes(status)) {
+      // If status value is not valid based on the enum, return an error response
+      return res.status(400).json({ error: "Invalid status value" });
+    }
     const order = await Order.findByIdAndUpdate(
       id,
       {
@@ -534,7 +538,7 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
   } catch (error) {
     // Log the error for debugging purposes
     console.error(error);
-    // Send an appropriate response to the client
+    // Send a generic error response for other errors
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
