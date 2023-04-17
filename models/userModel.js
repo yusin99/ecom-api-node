@@ -7,38 +7,34 @@ var userSchema = new mongoose.Schema(
   {
     firstname: {
       type: String,
-      required: true,
+      required: [true, "Please provide first name"],
       index: true,
     },
     lastname: {
       type: String,
-      required: true,
+      required: [true, "Please provide last name"],
       index: true,
     },
     email: {
       type: String,
-      required: true,
+      required: [true, "Please provide email"],
+      match: [
+        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+        " Invalid email format",
+      ],
       unique: true,
     },
     mobile: {
       type: String,
-      required: true,
+      required: [true, "Please provide mobile number"],
       unique: true,
     },
     password: {
       type: String,
-      required: true,
+      required: [true, "Please provide password"],
       minlength: 8, // Minimum password length
-      validate: {
-        validator: function (value) {
-          // Password complexity requirements: at least one uppercase letter, one lowercase letter, one digit, and one special character
-          return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/.test(
-            value
-          );
-        },
-        message:
-          "Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character",
-      },
+      match: [/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/,
+      "Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character"]
     },
     role: {
       type: String,
@@ -74,7 +70,7 @@ var userSchema = new mongoose.Schema(
     },
     address: {
       type: String,
-      required: true,
+      required: [true, "Please provide address"],
     },
     passwordChangedAt: Date,
     passwordResetToken: String,
