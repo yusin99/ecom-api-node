@@ -1,7 +1,7 @@
 const bodyParser = require("body-parser");
 const express = require("express");
 const app = express();
-const dbConnection = require("./config/db-connection");
+const dbConnection = require("./services/db-connection");
 const { errorHandler, notFound } = require("./middlewares/error-handler");
 const dotenv = require("dotenv").config();
 const PORT = process.env.PORT || 4000;
