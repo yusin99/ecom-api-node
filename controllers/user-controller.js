@@ -2,6 +2,7 @@ const User = require("../models/userModel");
 const Product = require("../models/productModel");
 const Cart = require("../models/cartModel");
 const Coupon = require("../models/couponModel");
+const Order = require("../models/orderModel");
 const asyncHandler = require("express-async-handler");
 const { generateToken } = require("../config/jwt-token");
 const validateMongoDBId = require("../utils/validateMDBId");
@@ -9,6 +10,7 @@ const { generateRefreshToken } = require("../config/refresh-token");
 const jwt = require("jsonwebtoken");
 const sendEmail = require("./email-controller");
 const crypto = require("crypto");
+const uniqid = require("uniqid");
 
 const handleRefreshToken = asyncHandler(async (req, res, next) => {
   const cookie = req.cookies;
@@ -405,6 +407,138 @@ const applyCoupon = asyncHandler(async (req, res) => {
   res.json({ totalAfterDiscount });
 });
 
+const createOrder = asyncHandler(async (req, res) => {
+  const { COD, couponApplied } = req.body;
+  const { id } = req.user;
+  validateMongoDBId(id);
+  try {
+    if (!COD) {
+      throw new Error("Cash on Delivery failed");
+    }
+
+    const user = await User.findById(id);
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    let userCart = await Cart.findOne({ ordered_by: user.id });
+    if (!userCart) {
+      throw new Error("Cart not found");
+    }
+
+    let finalAmount = 0;
+    if (couponApplied && userCart.total_after_discount) {
+      finalAmount = userCart.total_after_discount;
+    } else {
+      finalAmount = userCart.cart_total;
+    }
+
+    let order = await new Order({
+      products: userCart.products,
+      paymentIntent: {
+        id: uniqid(),
+        method: "COD",
+        amount: finalAmount,
+        status: "Cash on Delivery",
+        created: Date.now(),
+        currency: "USD",
+      },
+      ordered_by: user.id,
+      orderStatus: "Cash on Delivery",
+    }).save();
+
+    let updateQuantity = userCart.products.map((item) => {
+      return {
+        updateOne: {
+          filter: { id: item.product.id },
+          update: { $inc: { quantity: -item.count, sold: +item.count } },
+        },
+      };
+    });
+
+    const updatedProduct = await Product.bulkWrite(updateQuantity, {});
+    res.json({ message: "Success" });
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
+const getAllOrders = asyncHandler(async (req, res) => {
+  try {
+    const orders = await Orders.find();
+    res.json({ orders });
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
+const getAllUserOrders = asyncHandler(async (req, res) => {
+  const { id } = req.user;
+  validateMongoDBId(id);
+  try {
+    const orders = await Order.findOne({ ordered_by: id })
+      .populate("products.product")
+      .exec();
+    console.log(orders, id);
+    res.json({ orders });
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
+const getSingleOrder = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  validateMongoDBId(id);
+  try {
+    const order = await Order.findById(id);
+    if (!order) {
+      return res.status(404).json({ message: "Order not found", status: 404 });
+    }
+    res.json({ order });
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
+const deleteSingleOrder = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  validateMongoDBId(id);
+  try {
+    const deletedOrder = await Order.findByIdAndDelete(id);
+    res.json({ deletedOrder });
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
+const updateOrderStatus = asyncHandler(async (req, res) => {
+  const { status } = req.body;
+  const { id } = req.params;
+  validateMongoDBId(id);
+  try {
+    const order = await Order.findByIdAndUpdate(
+      id,
+      {
+        orderStatus: status,
+        paymentIntent: {
+          status: status,
+        },
+      },
+      { new: true }
+    );
+    if (!order) {
+      // If order is not found, return an error response
+      return res.status(404).json({ error: "Order not found" });
+    }
+    res.json({ order });
+  } catch (error) {
+    // Log the error for debugging purposes
+    console.error(error);
+    // Send an appropriate response to the client
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
 module.exports = {
   createUser,
   loginUser,
@@ -426,4 +560,10 @@ module.exports = {
   getUserCart,
   emptyCart,
   applyCoupon,
+  createOrder,
+  getAllOrders,
+  getAllUserOrders,
+  getSingleOrder,
+  deleteSingleOrder,
+  updateOrderStatus,
 };

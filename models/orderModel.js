@@ -19,13 +19,14 @@ var orderSchema = new mongoose.Schema(
       default: "Not processed",
       enum: [
         "Not processed",
+        "Cash on Delivery",
         "Processing",
         "Dispatched",
         "Calcelled",
         "Delivered",
       ],
     },
-    orderedBy: {
+    ordered_by: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
