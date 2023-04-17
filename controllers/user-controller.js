@@ -342,6 +342,32 @@ const userCart = asyncHandler(async (req, res) => {
   }
 });
 
+const getUserCart = asyncHandler(async (req, res) => {
+  const { id } = req.user;
+  validateMongoDBId(id);
+
+  try {
+    const cart = await Cart.findOne({ ordered_by: id }).populate(
+      "products.product",
+      "id title brand price images total_after_discount"
+    );
+    res.json({ cart });
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
+const emptyCart = asyncHandler(async (req, res) => {
+  const { id } = req.user;
+  validateMongoDBId(id);
+  try {
+    const user = await User.findById(id);
+    const cart = await Cart.findOneAndRemove({ ordered_by: user.id });
+    res.json({ cart });
+  } catch (error) {
+    throw new Error(error);
+  }
+});
 module.exports = {
   createUser,
   loginUser,
