@@ -1,6 +1,7 @@
 const User = require("../models/userModel");
 const Product = require("../models/productModel");
 const Cart = require("../models/cartModel");
+const Coupon = require("../models/couponModel");
 const asyncHandler = require("express-async-handler");
 const { generateToken } = require("../config/jwt-token");
 const validateMongoDBId = require("../utils/validateMDBId");
@@ -368,6 +369,42 @@ const emptyCart = asyncHandler(async (req, res) => {
     throw new Error(error);
   }
 });
+
+const applyCoupon = asyncHandler(async (req, res) => {
+  const { id } = req.user;
+  validateMongoDBId(id);
+  const coupon = req.body;
+  const validCoupon = await Coupon.findOne({ name: coupon.coupon });
+
+  if (!validCoupon) {
+    return res.status(400).json({ error: "Invalid coupon", status: 400 });
+  }
+
+  const user = await User.findById(id);
+  if (!user) {
+    return res.status(404).json({ error: "User not found", status: 404 });
+  }
+
+  const cart = await Cart.findOne({ ordered_by: user.id }).populate(
+    "products.product"
+  );
+  if (!cart) {
+    return res.status(404).json({ error: "Cart not found", status: 404 });
+  }
+
+  let { cart_total } = cart;
+  let totalAfterDiscount = (
+    cart_total -
+    (cart_total * validCoupon.discount) / 100
+  ).toFixed(2);
+  await Cart.findOneAndUpdate(
+    { ordered_by: user.id },
+    { total_after_discount: totalAfterDiscount },
+    { new: true }
+  );
+  res.json({ totalAfterDiscount });
+});
+
 module.exports = {
   createUser,
   loginUser,
@@ -386,4 +423,7 @@ module.exports = {
   getWishlist,
   updateAddress,
   userCart,
+  getUserCart,
+  emptyCart,
+  applyCoupon,
 };
