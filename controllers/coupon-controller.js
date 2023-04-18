@@ -5,7 +5,7 @@ const validateMongoDBId = require("../utils/validateMDBId");
 const createCoupon = asyncHandler(async (req, res) => {
   try {
     const coupon = await Coupon.create(req.body);
-    res.json({ coupon });
+    res.json(coupon);
   } catch (error) {
     throw new Error(error);
   }
@@ -14,7 +14,7 @@ const createCoupon = asyncHandler(async (req, res) => {
 const getAllCoupons = asyncHandler(async (req, res) => {
   try {
     const coupons = await Coupon.find();
-    res.json({ coupons });
+    res.json(coupons);
   } catch (error) {
     throw new Error(error);
   }
@@ -28,7 +28,7 @@ const getSingleCoupon = asyncHandler(async (req, res) => {
     if (!coupons) {
       return res.status(404).json({ message: "Coupon not found", status: 404 });
     }
-    res.json({ coupons });
+    res.json(coupons);
   } catch (error) {
     throw new Error(error);
   }
@@ -41,7 +41,7 @@ const updateSingleCoupon = asyncHandler(async (req, res) => {
     const coupon = await Coupon.findOneAndUpdate(id, req.body, {
       new: true,
     });
-    res.json({ coupon });
+    res.json(coupon);
   } catch (error) {
     throw new Error(error);
   }
@@ -52,7 +52,7 @@ const deleteSingleCoupon = asyncHandler(async (req, res, next) => {
   validateMongoDBId(id);
   try {
     const coupon = await Coupon.findByIdAndDelete(id);
-    res.json({ coupon });
+    res.json(coupon);
   } catch (error) {
     throw new Error(error);
   }

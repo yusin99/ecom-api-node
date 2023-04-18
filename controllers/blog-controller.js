@@ -37,12 +37,11 @@ const updateBlogPost = asyncHandler(async (req, res, next) => {
     const updatedBlogPost = await Blog.findOneAndUpdate(id, req.body, {
       new: true,
     });
-    res.json({ updatedBlogPost });
+    res.json(updatedBlogPost);
   } catch (error) {
     throw new Error(error);
   }
 });
-
 
 /**
 @description Deletes a blog post
@@ -60,13 +59,12 @@ const deleteBlogPost = asyncHandler(async (req, res, next) => {
     if (!deleteBlogPost) {
       throw new Error("Coudn't delete blog post! Blog post was not found");
     } else {
-      res.json({ deleteBlogPost });
+      res.json(deleteBlogPost);
     }
   } catch (error) {
     throw new Error(error);
   }
 });
-
 
 /**
 @description Gets a single blog post by ID
@@ -90,12 +88,11 @@ const getSingleBlogPost = asyncHandler(async (req, res, next) => {
       },
       { new: true }
     );
-    res.json({ blogPost });
+    res.json(blogPost);
   } catch (error) {
     throw new Error(error);
   }
 });
-
 
 /**
 @description Gets all blog posts
@@ -111,12 +108,11 @@ const getAllBlogPosts = asyncHandler(async (req, res, next) => {
     if (!posts) {
       return res.status(404).json({ message: "Post not found", status: 404 });
     }
-    res.json({ posts });
+    res.json(posts);
   } catch (error) {
     throw new Error(error);
   }
 });
-
 
 /**
  * @description Like a blog post
@@ -166,9 +162,8 @@ const likeBlogPost = asyncHandler(async (req, res) => {
     );
   }
 
-  res.json({ blog: updatedBlog }); // Send the updated blog object in the response
+  res.json(updatedBlog); // Send the updated blog object in the response
 });
-
 
 /**
  * @description Dislike a blog post using the same endpoint for liking
@@ -200,7 +195,7 @@ const dislikeBlogPost = asyncHandler(async (req, res) => {
       },
       { new: true }
     );
-    res.json({ blog: updatedBlog });
+    res.json(updatedBlog);
   }
   // Check if the blog post is already disliked
   else if (isDisliked) {
@@ -212,7 +207,7 @@ const dislikeBlogPost = asyncHandler(async (req, res) => {
       },
       { new: true }
     );
-    res.json({ blog: updatedBlog });
+    res.json(updatedBlog);
   }
   // If not already liked or disliked, add the dislike for the user
   else {
@@ -224,10 +219,9 @@ const dislikeBlogPost = asyncHandler(async (req, res) => {
       },
       { new: true }
     );
-    res.json({ blog: updatedBlog });
+    res.json(updatedBlog);
   }
 });
-
 
 /**
  * @description Upload images for a blog post
@@ -259,7 +253,7 @@ const uploadImages = asyncHandler(async (req, res) => {
       },
       { new: true }
     );
-    res.json({ blog });
+    res.json(blog);
   } catch (error) {
     throw new Error(error);
   }

@@ -12,7 +12,7 @@ const createProduct = asyncHandler(async (req, res, next) => {
       req.body.slug = slugify(req.body.title);
     }
     const newProduct = await Product.create(req.body);
-    res.json({ newProduct });
+    res.json(newProduct);
   } catch (error) {
     throw new Error(error);
   }
@@ -27,7 +27,7 @@ const updateSingleProduct = asyncHandler(async (req, res, next) => {
     const updateProduct = await Product.findOneAndUpdate(id, req.body, {
       new: true,
     });
-    res.json({ updateProduct });
+    res.json(updateProduct);
   } catch (error) {
     throw new Error(error);
   }
@@ -37,7 +37,7 @@ const deleteSingleProduct = asyncHandler(async (req, res, next) => {
   validateMongoDBId(id);
   try {
     const deleteProduct = await Product.findByIdAndDelete(id);
-    res.json({ deleteProduct });
+    res.json(deleteProduct);
   } catch (error) {
     throw new Error(error);
   }
@@ -52,7 +52,7 @@ const getSingleProduct = asyncHandler(async (req, res, next) => {
         .status(404)
         .json({ message: "Product not found", status: 404 });
     }
-    res.json({ getProduct });
+    res.json(getProduct);
   } catch (error) {
     throw new Error(error);
   }
@@ -97,7 +97,7 @@ const getAllProducts = asyncHandler(async (req, res) => {
     if (products.length <= 0) {
       throw new Error("No products where found for the selected filters");
     } else {
-      res.json({ products });
+      res.json(products);
     }
   } catch (error) {
     throw new Error(error);
@@ -122,7 +122,7 @@ const addToWishlist = asyncHandler(async (req, res) => {
         },
         { new: true }
       );
-      res.json({ user });
+      res.json(user);
     } else {
       let user = await User.findByIdAndUpdate(
         id,
@@ -131,7 +131,7 @@ const addToWishlist = asyncHandler(async (req, res) => {
         },
         { new: true }
       );
-      res.json({ user });
+      res.json(user);
     }
   } catch (error) {
     throw new Error(error);
@@ -187,7 +187,7 @@ const rating = asyncHandler(async (req, res) => {
       },
       { new: true }
     );
-    res.json({ updatedProduct });
+    res.json(updatedProduct);
   } catch (error) {
     throw new Error(error);
   }

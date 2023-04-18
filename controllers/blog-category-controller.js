@@ -37,7 +37,7 @@ const getSingleCategory = asyncHandler(async (req, res) => {
         .status(404)
         .json({ message: "Blog category not found", status: 404 });
     }
-    res.json({ category });
+    res.json(category);
   } catch (error) {
     throw new Error(error);
   }
@@ -59,7 +59,7 @@ const getAllCategories = asyncHandler(async (req, res) => {
         .status(404)
         .json({ message: "Blog categories not found", status: 404 });
     }
-    res.json({ categories });
+    res.json(categories);
   } catch (error) {
     throw new Error(error);
   }
@@ -85,7 +85,7 @@ const updateSingleCategory = asyncHandler(async (req, res) => {
       },
       { new: true }
     );
-    res.json({ category });
+    res.json(category);
   } catch (error) {
     throw new Error(error);
   }
@@ -105,7 +105,7 @@ const deleteSingleCategory = asyncHandler(async (req, res, next) => {
   validateMongoDBId(id);
   try {
     const category = await BCategory.findByIdAndDelete(id);
-    res.json({ category });
+    res.json(category);
   } catch (error) {
     throw new Error(error);
   }

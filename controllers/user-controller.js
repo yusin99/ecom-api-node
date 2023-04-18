@@ -26,7 +26,7 @@ const handleRefreshToken = asyncHandler(async (req, res, next) => {
       );
     }
     const accessToken = generateToken(user?.id);
-    res.json({ accessToken });
+    res.json(accessToken);
   });
 });
 
@@ -146,7 +146,7 @@ const updateSingleUser = asyncHandler(async (req, res) => {
       },
       { new: true }
     );
-    res.json({ updateUser });
+    res.json(updateUser);
   } catch (error) {
     throw new Error(error);
   }
@@ -155,7 +155,7 @@ const updateSingleUser = asyncHandler(async (req, res) => {
 const getAllUsers = asyncHandler(async (req, res) => {
   try {
     const getUsers = await User.find();
-    res.json({ getUsers });
+    res.json(getUsers);
   } catch (error) {
     throw new Error(error);
   }
@@ -169,7 +169,7 @@ const getSingleUsers = asyncHandler(async (req, res) => {
     if (!getUsers) {
       return res.status(404).json({ message: "User not found", status: 404 });
     }
-    res.json({ getUsers });
+    res.json(getUsers);
   } catch (error) {
     throw new Error(error);
   }
@@ -180,7 +180,7 @@ const deleteSingleUser = asyncHandler(async (req, res) => {
   validateMongoDBId(id);
   try {
     const deleteUser = await User.findByIdAndDelete(id);
-    res.json({ deleteUser });
+    res.json(deleteUser);
   } catch (error) {
     throw new Error(error);
   }
@@ -238,9 +238,9 @@ const updatePassword = asyncHandler(async (req, res, next) => {
   if (password) {
     user.password = password;
     const updatedPassword = await user.save();
-    res.json({ updatedPassword });
+    res.json(updatedPassword);
   } else {
-    res.json({ user });
+    res.json(user);
   }
 });
 
@@ -261,7 +261,7 @@ const forgotPassword = asyncHandler(async (req, res, next) => {
       htm: resetURL,
     };
     sendEmail(data);
-    res.json({ token });
+    res.json(token);
   } catch (error) {
     throw new Error(error);
   }
@@ -280,7 +280,7 @@ const resetPassword = asyncHandler(async (req, res) => {
   user.passwordResetToken = undefined;
   user.passwordResetExpires = undefined;
   await user.save();
-  res.json({ user });
+  res.json(user);
 });
 
 const getWishlist = asyncHandler(async (req, res) => {
@@ -304,7 +304,7 @@ const updateAddress = asyncHandler(async (req, res) => {
       },
       { new: true }
     );
-    res.json({ user });
+    res.json(user);
   } catch (error) {
     throw new Error(error);
   }
@@ -339,7 +339,7 @@ const userCart = asyncHandler(async (req, res) => {
       cart_total: cartTotal.toFixed(2),
       ordered_by: user.id,
     }).save();
-    res.json({ updatedCart });
+    res.json(updatedCart);
   } catch (error) {
     throw new Error(error);
   }
@@ -354,7 +354,7 @@ const getUserCart = asyncHandler(async (req, res) => {
       "products.product",
       "id title brand price images total_after_discount"
     );
-    res.json({ cart });
+    res.json(cart);
   } catch (error) {
     throw new Error(error);
   }
@@ -366,7 +366,7 @@ const emptyCart = asyncHandler(async (req, res) => {
   try {
     const user = await User.findById(id);
     const cart = await Cart.findOneAndRemove({ ordered_by: user.id });
-    res.json({ cart });
+    res.json(cart);
   } catch (error) {
     throw new Error(error);
   }
@@ -404,7 +404,7 @@ const applyCoupon = asyncHandler(async (req, res) => {
     { total_after_discount: totalAfterDiscount },
     { new: true }
   );
-  res.json({ totalAfterDiscount });
+  res.json(totalAfterDiscount);
 });
 
 const createOrder = asyncHandler(async (req, res) => {
@@ -466,7 +466,7 @@ const createOrder = asyncHandler(async (req, res) => {
 const getAllOrders = asyncHandler(async (req, res) => {
   try {
     const orders = await Orders.find();
-    res.json({ orders });
+    res.json(orders);
   } catch (error) {
     throw new Error(error);
   }
@@ -480,7 +480,7 @@ const getAllUserOrders = asyncHandler(async (req, res) => {
       .populate("products.product")
       .exec();
     console.log(orders, id);
-    res.json({ orders });
+    res.json(orders);
   } catch (error) {
     throw new Error(error);
   }
@@ -494,7 +494,7 @@ const getSingleOrder = asyncHandler(async (req, res) => {
     if (!order) {
       return res.status(404).json({ message: "Order not found", status: 404 });
     }
-    res.json({ order });
+    res.json(order);
   } catch (error) {
     throw new Error(error);
   }
@@ -505,7 +505,7 @@ const deleteSingleOrder = asyncHandler(async (req, res) => {
   validateMongoDBId(id);
   try {
     const deletedOrder = await Order.findByIdAndDelete(id);
-    res.json({ deletedOrder });
+    res.json(deletedOrder);
   } catch (error) {
     throw new Error(error);
   }
@@ -534,7 +534,7 @@ const updateOrderStatus = asyncHandler(async (req, res) => {
       // If order is not found, return an error response
       return res.status(404).json({ error: "Order not found" });
     }
-    res.json({ order });
+    res.json(order);
   } catch (error) {
     // Log the error for debugging purposes
     console.error(error);
